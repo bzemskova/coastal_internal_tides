@@ -1,0 +1,70 @@
+% File to accompany manuscript by Zemskova, V.E., Musgrave, R.C. and
+% Lerczak, J. A., 
+%titled "Internal tides at the coast: energy flux of baroclinic tides propagating into
+%the deep ocean in the presence of supercritical shelf topography"
+
+%File to run a domain size test 
+%       for an example simulation with specified grid spacing, topography,
+%       and stratification parameters 
+
+%   Also can specify Coriolis parameter, forcing frequency, along-shore
+%   wavenumber, forcing type (Baines vs. isolated), surface boundary
+%   condition (rigid lid vs. free linear surface.
+%        
+%   Outputs and plots vertically-integrated cross-shore energy flux for
+%       different domain sizes to assess convergence.
+
+
+%  Barbara Zemskova
+%  College of Earth, Ocean, and Atmospheric Sciences
+%  Oregon State University
+%  barbara.zemskova@oregonstate.edu
+%  November, 2022
+
+%% Set-up parameters
+
+addpath('./matlab_functions')
+load('colorblind_colormap.mat')
+
+%domain size (in km)
+L_vec = 300:100:1200;
+Nx_vec = L_vec*6;
+Nz = 200; %grid resolution in z
+
+
+R = 0; %rigid lid
+Zpyc = -600; %pycnocline depth
+mupyc = 200; %pycnocline width
+force_type = 0; %Baines body force
+l = 7e-9; %along-shore wavenumber; small value close to 0
+L = 800e3; %cross-shore domain extent (m)
+h0 = 3100; %max depth (m)
+W = 32e3; %slope width (m)
+xs = 80e3; %shelf width (m)
+hc = 100; %depth at the coast (m)
+hs = 150; %depth at shelf break
+f = 9.3e-5; %Coriolis parameter (1/s)
+sigma = 1.41e-4; %forcing frequency (1/s), M2 tide
+rho0 = 1000; %background density (kg/m^3)
+g = 9.81; %gravity (m/s^2)
+
+%% Sweep over Nx (horizontal resolution), keep Nz constant
+
+figure;
+hold on
+colororder(colorblind)
+for inx = 1:length(L_vec)
+    
+    [XFlux,~,~,~,~,~,~,...
+    ~,~,~,...
+    xx,~,~,~,~,~] = ...
+    func_simulation(Nx_vec(inx), Nz, R, Zpyc, mupyc, force_type, l,...
+    L_vec(inx)*1e3,h0,W,xs,hc,hs,f,sigma);
+
+    plot(xx(1,1:2:end)/1e3,XFlux/1e3,'LineWidth',2)
+    
+end
+legend('300km','400km','500km','600km','700km','800km',);
+xlabel('Cross-shore distance (km)')
+ylabel('Cross-shore energy flux (kW/m)')
+title('Vary domain size')
