@@ -8,7 +8,7 @@
 
 %   Also can specify Coriolis parameter, forcing frequency, along-shore
 %   wavenumber, forcing type (Baines vs. isolated), surface boundary
-%   condition (rigid lid vs. free linear surface.
+%   condition (rigid lid vs. free linear surface)
 %        
 %   Outputs velocity and pressure fields plus energy flux fields
 %   (cross-shore, along-shore; 2D and vertically integrated values)

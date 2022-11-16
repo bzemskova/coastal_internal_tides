@@ -9,7 +9,7 @@
 
 %   Also can specify Coriolis parameter, forcing type (Baines vs. isolated), 
 %       surface boundary
-%       condition (rigid lid vs. free linear surface.
+%       condition (rigid lid vs. free linear surface)
 %        
 %   Outputs domain-integrated values of pressure and cross-shore velocity
 %       (u) for each value of frequency and along-shore wavenumber.
@@ -17,7 +17,7 @@
 
 %   Plots resonance scan (domain-integrated pressure values) sweeping over 
 %       frequency and along-shore wavenumbers and dispersion curves for
-%       other relavant modes.
+%       other relevant modes.
 
 %  Barbara Zemskova
 %  College of Earth, Ocean, and Atmospheric Sciences

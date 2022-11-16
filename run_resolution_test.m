@@ -9,7 +9,7 @@
 
 %   Also can specify Coriolis parameter, forcing frequency, along-shore
 %   wavenumber, forcing type (Baines vs. isolated), surface boundary
-%   condition (rigid lid vs. free linear surface.
+%   condition (rigid lid vs. free linear surface)
 %        
 %   Outputs and plots vertically-integrated cross-shore energy flux for
 %       different vertical and horizontal resolutions to assess convergence.
