@@ -270,5 +270,5 @@ end
 
 %vertically-integrated cross-shore energy flux at the off-shore boundary
 %(W/m)
-up_modal_integrated = g*rho0*h(1)*(mean(up_modal_offshore,1));
+up_modal_integrated = h(1)*(mean(up_modal_offshore,1));
 end
