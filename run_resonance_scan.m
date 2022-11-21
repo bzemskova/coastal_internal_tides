@@ -63,6 +63,7 @@ P0p_sweep = zeros(Nsigma,Nl);
 
 
 for is = 1:Nsigma
+    disp(is)
     for il = 1:Nl
             [P0u,P0p] = ...
                 func_resonance(Nx, Nz, R, Zpyc, mupyc, force_type, LI(il),...
@@ -71,6 +72,7 @@ for is = 1:Nsigma
             P0u_sweep(is,il) = P0u;
             P0p_sweep(is,il) = P0p;
     end
+    save('resonance_scan_600_200_R_0.mat')
 end
 
 %% Plot the resulting resonance scan
