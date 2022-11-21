@@ -107,24 +107,6 @@ for ii = 1:Nx
     zx(:,ii) = s*hx(ii);
 end
 
-figure
-clf
-subplot(3,1,1)
-plot(x/1000,-h) ;
-axis([min(x)/1000 0 -h0 0]) ;
-title('water depth (m) -- -h(x)')
-
-subplot(3,1,2) 
-plot(x/1000,-hx) ;
-hold on
-axis([min(x)/1000 0 0 max(-hx)]) ;
-title('-dh/dx')
-
-subplot(3,1,3) ;
-plot(x/1000,-hx.*sqrt((N2bot - f^2)/((sigma)^2 - f^2)),'r') ;
-title('bottom slope / critical slope (>1 is supercritical)')
-xlabel('cross-shore distance (km)')
-
 %%  Stratification, buoyancy frequency and other related variables.  
 
 %  stratification parameters
@@ -150,6 +132,24 @@ end
 
 %for non-hydrostatic term
 N2z_N2is = N2z_N2.*N2./(N2-sigma^2);
+
+figure
+clf
+subplot(3,1,1)
+plot(x/1000,-h) ;
+axis([min(x)/1000 0 -h0 0]) ;
+title('water depth (m) -- -h(x)')
+
+subplot(3,1,2) 
+plot(x/1000,-hx) ;
+hold on
+axis([min(x)/1000 0 0 max(-hx)]) ;
+title('-dh/dx')
+
+subplot(3,1,3) ;
+plot(x/1000,-hx.*sqrt((N2(1,:) - f^2)/((sigma)^2 - f^2)),'r') ;
+title('bottom slope / critical slope (>1 is supercritical)')
+xlabel('cross-shore distance (km)')
 
 figure
 clf
