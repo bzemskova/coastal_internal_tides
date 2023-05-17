@@ -47,6 +47,9 @@ g = 9.81; %gravity (m/s^2)
 N2back = (2*pi/(0.5*60*60))^2 ; %background linear stratification N^2 (1/s^2)
 eta0 = 0.1; %sea surface elevation at the coast (m)
 
+Zpyc = -800; %pycnocline width (m) --> must be negative
+mupyc = 200; %pycnocline depth (m) --> must be positive
+
 %% Range of frequencies and along-shore wavenumbers to consider
 Nsigma = 1000;
 Nl = 400;
@@ -76,7 +79,7 @@ for is = 1:Nsigma
             %  pressure variance across the domain in response to forcing
             P0p_sweep(il) = P0p ;
     end
-    save('resonance_scan_600_200_R_0.mat')
+    save('resonance_scan_800_200_R_0.mat')
 end
 
 %% Plot the resulting resonance scan
