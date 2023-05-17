@@ -19,54 +19,57 @@
 %  College of Earth, Ocean, and Atmospheric Sciences
 %  Oregon State University
 %  barbara.zemskova@oregonstate.edu
-%  November, 2022
+%  May, 2023
 
 %% Set-up parameters
 
 addpath('./matlab_functions')
-load('colorblind_colormap.mat')
 
 %grid points in x
-Nx_vec = [300,600,900,1200, 1500,2000, 2500,...
-          3000, 3600, 4200, 4800, 5400  ];
+Nx_vec = 600:200:2400;
 %grid points in z
-Nz = [30, 40, 50, 70, 90, 110, 150, 200, 250, 300]; 
+Nz = [10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 300]; 
 
-R = 0; %rigid lid
-Zpyc = -600; %pycnocline depth
-mupyc = 200; %pycnocline width
+Nx = 1800; %grid points in x
+Nz = 300; %grid points in z
+R = 0;  %rigid lid
 force_type = 0; %Baines body force
-l = 7e-9; %along-shore wavenumber; small value close to 0
-L = 800e3; %cross-shore domain extent (m)
+l = 0; %along-shore wavenumber; 
+L = 300e3; %cross-shore domain extent (m)
 h0 = 3100; %max depth (m)
-W = 32e3; %slope width (m)
+xW = 32e3; %slope width (m)
 xs = 80e3; %shelf width (m)
-hc = 100; %depth at the coast (m)
-hs = 150; %depth at shelf break
-f = 9.3e-5; %Coriolis parameter (1/s)
+hc = 100;  %depth at the coast (m)
+hs = 150;  %depth at shelf break
+f = 0.93e-4;  %Coriolis parameter (1/s)
 sigma = 1.41e-4; %forcing frequency (1/s), M2 tide
 rho0 = 1000; %background density (kg/m^3)
 g = 9.81; %gravity (m/s^2)
+N2back = (2*pi/(0.5*60*60))^2 ; %background linear stratification N^2 (1/s^2)
+eta0 = 0.1; %sea surface elevation at the coast (m)
+
+Zpyc = -800; %pycnocline depth (m) %must be negative
+mupyc = 200; %pycnocline width (m) %must be positive
 
 %% Sweep over Nx (horizontal resolution), keep Nz constant
 
 figure;
 subplot(1,2,1)
 hold on
-colororder(colorblind)
 for inx = 1:length(Nx_vec)
     
-    [XFlux,~,~,~,~,~,~,...
-    ~,~,~,...
-    xx,~,~,~,~,~] = ...
-    func_simulation(Nx_vec(inx), max(Nz_vec), R, Zpyc, mupyc, force_type, l,...
-    L,h0,W,xs,hc,hs,f,sigma);
+    [~,~,~,XFlux,~, ~, ~,...
+                ~, ~, ~, ~, ~,...
+                xx, ~, ~, ~, ~, ~] = ...
+                        func_simulation(Nx_vec(inx), Nz, R, Zpyc, mupyc, force_type, l,...
+                        L,h0,xW,xs,hc,hs,f,sigma,N2back,eta0);
+
 
     plot(xx(1,1:2:end)/1e3,XFlux/1e3,'LineWidth',2)
     
 end
-legend('300','600','900','1200', '1500','2000', '2500',...
-          '3000', '3600', '4200', '4800', '5400');
+legend('600','800','1000','1200', '1400','1800', '2000',...
+          '2200', '2400');
 xlabel('Cross-shore distance (km)')
 ylabel('Cross-shore energy flux (kW/m)')
 title('Vary Nx')
@@ -75,19 +78,20 @@ title('Vary Nx')
 
 subplot(1,2,2)
 hold on
-colororder(colorblind)
 for inz = 1:length(Nz_vec)
     
-    [XFlux,~,~,~,~,~,~,...
-    ~,~,~,...
-    xx,~,~,~,~,~] = ...
-    func_simulation(max(Nx_vec), Nz_vec(inz), R, Zpyc, mupyc, force_type, l,...
-    L,h0,W,xs,hc,hs,f,sigma);
+    [~,~,~,XFlux,~, ~, ~,...
+                ~, ~, ~, ~, ~,...
+                xx, ~, ~, ~, ~, ~] = ...
+                        func_simulation(Nx, Nz_vec(inz), R, Zpyc, mupyc, force_type, l,...
+                        L,h0,xW,xs,hc,hs,f,sigma,N2back,eta0);
 
-    plot(xx(1,1:2:end),XFlux,'LineWidth',2)
+
+    plot(xx(1,1:2:end),XFlux,'LineWidth',1.5)
     
 end
-legend('30', '40', '50', '70', '90', '110', '150', '200', '250', '300');
+legend('10', '20', '30', '40', '50', ...
+    '75', '100','150', '200', '250', '300');
 xlabel('Cross-shore distance (km)')
 ylabel('Cross-shore energy flux (kW/m)')
 title('Vary Nz')

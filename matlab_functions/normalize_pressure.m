@@ -1,5 +1,5 @@
 function [uModeF,vModeF,pModeF,XFlux,AFlux,fu,fv] = ...
-    normalize_pressure(PP,l,f,sigma,xx,z,h,np,nu,eta_coast)
+    normalize_pressure(PP,l,f,sigma,xx,z,h,np,nu)
 
 %function to dimensionalize and normalize cross-shore velocity and pressure
 % output and also compute energy fluxes
@@ -37,16 +37,13 @@ function [uModeF,vModeF,pModeF,XFlux,AFlux,fu,fv] = ...
 rho0 = 1000;
 g = 9.8;
 
-% normalize raw pressure output such that sea-surface elevation
-%   at the coast = eta_coast
-%   (take eta_coast = 0.1 m)
 pModeC = PP(:,np);
-scl = mean(abs(pModeC(:,end))); 
-pModeC = eta_coast*pModeC/scl;
+
 
 %computes cross-shore and off-shore fluxes
 [uModeF,vModeF,pModeF] = calcModeFunc(pModeC,l,f,sigma,xx,z,h,np,nu,rho0);
 [XFlux,AFlux,fu,fv] = calcFluxFunc(uModeF,vModeF,pModeF,h,nu);
+
 
 % convert flux values to W/m^2 and vertically-integrated flux values to W/m
 XFlux = g*rho0*XFlux;

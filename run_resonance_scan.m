@@ -23,53 +23,57 @@
 %  College of Earth, Ocean, and Atmospheric Sciences
 %  Oregon State University
 %  barbara.zemskova@oregonstate.edu
-%  November, 2022
+%  May, 2023
 
 %% Set-up parameters
 
-addpath('./matlab_functions')
+addpath('./matlab_functions/')
 
-Nx = 4800; %grid points in x
+Nx = 1800; %grid points in x
 Nz = 300; %grid points in z
-R = 0; %rigid lid
-Zpyc = -600; %pycnocline depth
-mupyc = 200; %pycnocline width
+R = 0;  %rigid lid
 force_type = 0; %Baines body force
-L = 800e3; %cross-shore domain extent (m)
+l = 0; %along-shore wavenumber; 
+L = 300e3; %cross-shore domain extent (m)
 h0 = 3100; %max depth (m)
-W = 32e3; %slope width (m)
+xW = 32e3; %slope width (m)
 xs = 80e3; %shelf width (m)
-hc = 100; %depth at the coast (m)
-hs = 150; %depth at shelf break
-f = 9.3e-5; %Coriolis parameter (1/s)
+hc = 100;  %depth at the coast (m)
+hs = 150;  %depth at shelf break
+f = 0.93e-4;  %Coriolis parameter (1/s)
+sigma = 1.41e-4; %forcing frequency (1/s), M2 tide
 rho0 = 1000; %background density (kg/m^3)
 g = 9.81; %gravity (m/s^2)
-
-filename_mat = 'example_resonance_scan.mat';
+N2back = (2*pi/(0.5*60*60))^2 ; %background linear stratification N^2 (1/s^2)
+eta0 = 0.1; %sea surface elevation at the coast (m)
 
 %% Range of frequencies and along-shore wavenumbers to consider
 Nsigma = 1000;
-Nl = 200;
+Nl = 400;
 
 SI = linspace(0.001*f, 2*f,Nsigma); %range of frequencies
-LI = linspace(-1e-4,1e-4,Nl); %range of along-shore wavenumbers
+LI = linspace(0,1e-4,Nl); %range of along-shore wavenumbers
 
 %% Run resonance scan
 
 %domain-integrated cross-shore velocity response
-P0u_sweep = zeros(Nsigma,Nl); 
+P0u_sweep = zeros(Nsigma,Nl);
+
 %domain-integrated pressure response
 P0p_sweep = zeros(Nsigma,Nl);
 
 
+
 for is = 1:Nsigma
     for il = 1:Nl
-            [P0u,P0p] = ...
-                func_resonance(Nx, Nz, R, Zpyc, mupyc, force_type, LI(il),...
-                L,h0,W,xs,hc,hs,f,SI(is));
-
-            P0u_sweep(is,il) = P0u;
-            P0p_sweep(is,il) = P0p;
+            [P0p,P0u] = ...
+                 func_resonance(Nx, Nz, R, Zpyc, mupyc, force_type, l,...
+                L,h0,xW,xs,hc,hs,f,sigma,N2back,eta0);
+            %  cross-shore current variance across the domain in response to
+            %  forcing
+            P0u_sweep(il) = P0u ;
+            %  pressure variance across the domain in response to forcing
+            P0p_sweep(il) = P0p ;
     end
 end
 
@@ -110,8 +114,3 @@ end
 
 ylabel('\sigma/f','fontsize',16) ;
 xlabel('Alongshore wavenumber (m^{-1})','FontSize',16) ;
-
-
-
-
-

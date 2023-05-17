@@ -2,7 +2,7 @@
 %  College of Earth, Ocean, and Atmospheric Sciences
 %  Oregon State University
 %  barbara.zemskova@oregonstate.edu
-%  August, 2022
+%  May, 2023
 %
 %  This code solves trapped and scattered internal waves in a rotating,
 %  stratified basin with continental margin that is infinitely long and
@@ -29,14 +29,6 @@
 %  and super-inertial frequencies.  The structure of this forcing is set by
 %  the variable 'F' (see the get_initial.m script).
 
-% Specifically, the set-up here follows the test code from J. Klymak,
-% which in itself follows Dale and Sherwin (1996).
-% Stratification is constant with coastal shelf bathymetry.
-
-function [P0u_sd,P0p_sd] = ...
-    func_resonance(Nx, Nz, R, Zpyc, mupyc, force_type, l,...
-    L,h0,W,xs,hc,hs,f,sigma)
-
 
 %INPUTS:
 %     Nx[1,1]: number of grid points in x (cross-shore) direction
@@ -58,14 +50,20 @@ function [P0u_sd,P0p_sd] = ...
 %     hs[1,1]: depth at the shelf break (m)
 %     f[1,1]: Coriolis parameter (1/s)
 %     sigma[1,1]: forcing frequency (1/s)
+%     N2back[1,1]: background linear stratification N^2 (1/s^2)
+%     eta0[1,1]: sea surface elevation at the coast (m)
 
 % OUTPUTS:
 %     P0u_sd[1,1]: domain (x,z)-integrated velocity response
 %     P0p_sd[1,1]: domain (x,z)-integrated pressure response
 
+
+function [P0u_sd,P0p_sd] = ...
+                func_resonance(Nx, Nz, R, Zpyc, mupyc, force_type, l,...
+                L,h0,xW,xs,hc,hs,f,sigma,N2back,eta0)
+
 %%  Essentials
 I = sqrt(-1) ;
-eta_coast = 0.1;
                  
 g = 9.81 ;
 rho0 = 1000;
@@ -92,8 +90,8 @@ xx = ones(length(s),1)*x ;
 
 h = h0+0*x;
 for i=1:length(x)
-   if x(i)>-xs-W
-       h(i) = hs+(h0-hs)*(0.5*(1-cos((pi/W)*(x(i)+xs))))^0.75;
+   if x(i)>-xs-xW
+       h(i) = hs+(h0-hs)*(0.5*(1-cos((pi/xW)*(x(i)+xs))))^0.75;
    end
 end
 [~,ind] = min(h);
@@ -107,23 +105,6 @@ for ii = 1:Nx
     zx(:,ii) = s*hx(ii);
 end
 
-figure
-clf
-subplot(3,1,1)
-plot(x/1000,-h) ;
-axis([min(x)/1000 0 -h0 0]) ;
-title('water depth (m) -- -h(x)')
-
-subplot(3,1,2) 
-plot(x/1000,-hx) ;
-hold on
-axis([min(x)/1000 0 0 max(-hx)]) ;
-title('-dh/dx')
-
-subplot(3,1,3) ;
-plot(x/1000,-hx.*sqrt((N2bot - f^2)/((sigma)^2 - f^2)),'r') ;
-title('bottom slope / critical slope (>1 is supercritical)')
-xlabel('cross-shore distance (km)')
 
 %%  Stratification, buoyancy frequency and other related variables.  
 
@@ -132,13 +113,11 @@ r1 = 1027 ;           %  density of upper layer
 r2 = 1030 ;           %  density of lower layer
 r0 = (r1+r2)/2 ;      %  prescribed rho0
 dr = r2-r1 ;
-%  Background linear density gradient
-N2back = (2*pi/(0.5*60*60))^2 ;
 rz0 = -N2back*r0/g ;
 
 arg = (z - Zpyc)/mupyc ;
 rho = r2 - 0.5*dr*(1 + tanh(arg)) ;
-% 
+
 if  sqrt(N2back) < 1e-6
     N2 = 0.5*(dr/r0)*(g/mupyc)*(sech(arg).^2) ;
     N2z_N2 = -(2/mupyc)*tanh(arg) ;
@@ -148,24 +127,18 @@ else
     N2z_N2 = -(dr/r0)*(g/(mupyc^2))*(sech(arg).^2).*tanh(arg)./N2 ;
 end
 
-%for non-hydrostatic term
+% Constant linear stratification
+if Zpyc==0 && mupyc==0
+    N2 = N2back*ones(size(xx));
+    N2z_N2 = 0*N2;
+end
+
+% For non-hydrostatic term
 N2z_N2is = N2z_N2.*N2./(N2-sigma^2);
 
-figure
-clf
-subplot(2,1,1)
-pcolor(x/1000,z,rho) ;
-shading flat
-colorbar
-ylabel('density')
+% Topographic criticality parameter
+alpha = -hx.*sqrt((N2(1,:) - f^2)/((sigma)^2 - f^2));
 
-subplot(2,1,2)
-pcolor(x/1000,z,sqrt(N2)) ;
-shading flat
-colorbar
-ylabel('Depth (m)')
-xlabel('Cross-shore distance (km)')
-title('Buoyancy frequency N (s^{-1})')
 
 %%  Here is the solution engine.
 
@@ -191,15 +164,16 @@ p = 1 ;            %  Mode number for incident wave.  Only used when force = 1.
 % Calculate Baines body force
 %first use barotropic SSH that matches Dale and Sherwin model
 %and shelf width to calculate Baines' body force
-eta0=0.1;
-Fin = -eta0*(-xs)*zx.*N2./z;
-Fin(end,:) = Fin(end-1,:);
+Fin = 0*xx;
+for i=1:length(x)
+    Fin(:,i) = -eta0*(-xs)*hx(i).*N2(:,i).*z(:,i)/(h(i)^2);
+end
 
 %also need derivative of that F term (see manuscript)
 dFdz = Fin*0;
 for ix=1:Nx
     Z = h(ix)*s;
-    DP = ddz(Z,0)/h(ix);
+    DP = ddz(Z,0);%/h(ix);
     dFdz(:,ix) = DP*Fin(:,ix);
 end
 

@@ -41,9 +41,9 @@ if mod(ix,2) == 1                           %  odd ix: p equation
                     + (1/dz)*N2_is(1)*hx(ix) ;
         
     %  first derivative for pressure with appropriate boundary conditions
-    DP = ddz(Z,0)/h(ix) ;
-    DP(Nz,Nz-4:Nz) = [0 0 0 0 -R*N2(Nz,ix)/g] ;
-    DP(1,1:5) = [0 0 0 0 0] ;
+    DP = ddz(Z,0);%/h(ix) ;
+    DP(Nz,Nz-4:Nz) = [0 0 0 0 -R*N2(Nz,ix)/g];
+    DP(1,1:5) = [0 0 0 0 0];
     
     %  second derivative for pressure with appropriate boundary conditions
     DP2 = ddz2(Z,0) ;

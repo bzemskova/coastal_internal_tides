@@ -58,9 +58,9 @@ D1=ddz(z,0);                     %1st order derivative matrix for rigid lid cond
                                   %Correct the matrix for the surface and
                                   %bottom BCs
 %  zero gradient at the bottom
-D1(1,1:5) = [0 0 0 0 0] ;
+D1(1,1:5) = [0 0 0 0 0]/dz ;
 %  zero gradient or linear surface condition at surface
-D1(end,end-4:end) = [0 0 0 0 -R*N2(end)/g] ;
+D1(end,end-4:end) = [0 0 0 0 -R*N2(end)/g]/dz ;
 
 ML = D2 - diag(N2z_N2)*D1 ;
 % MR = -diag(N2)/(1 - (f/sigma)^2) ;

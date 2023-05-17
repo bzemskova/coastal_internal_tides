@@ -23,16 +23,32 @@ if force == 0
         %Baines forcing term only applies to p-equation
         F(:,np) = -((dFdz(:,np)-...
         Fin(:,np).*N2z_N2(:,np).* N2(:,np)./(N2(:,np)-sigma^2))) ;
-  
+
+        F(1,np) = F(2,np);
+        %maxF = max(abs(F(:)));
+        %F = (1e-9)*F/maxF;
+
     elseif force_type==1
         %isolated topographic forcing, applied only to p-equation
             FB(:,np) = -((dFdz(:,np)-...
         Fin(:,np).*N2z_N2(:,np).* N2(:,np)./(N2(:,np)-sigma^2))) ;
+
+            FB(1,np) = FB(2,np);
+
         for i=1:length(np)   
             if abs(x(np(i))+100e3)<1e3
                 F(:,np(i))=max(abs(FB(:))); 
             end
         end
+     
+    elseif force_type==2
+        FB(:,np) = -((dFdz(:,np)-...
+        Fin(:,np).*N2z_N2(:,np).* N2(:,np)./(N2(:,np)-sigma^2))) ;
+
+        FB(1,np) = FB(2,np);
+        
+        F(Nz,Nx-601) = max(abs(FB(:)));
+
     end
  
     
