@@ -18,8 +18,9 @@
 %% COMMON INPUTS: 
 
 addpath('./matlab_functions/')
+addpath('./data/')
 
-Nx = 1800; %grid points in x
+Nx = 3800; %grid points in x
 Nz = 300; %grid points in z
 R = 0;  %rigid lid
 force_type = 0; %Baines body force
@@ -39,7 +40,7 @@ eta0 = 0.1; %sea surface elevation at the coast (m)
 
 
 %% EXAMPLE 1: CONSTANT STRATIFICATION
-filename1 = 'constantN2_example.mat';
+filename1 = './data/example_constantN2.mat';
 
 % SET BOTH TO ZERO FOR CONSTANT STRATIFICATION
 Zpyc = 0;  % Pycnocline width (m) MUST BE NEGATIVE
@@ -93,10 +94,10 @@ save(filename1)
 
 %% EXAMPLE 2: NON-CONSTANT STRATIFICATION
 % pycnocline width = 800m,  depth = 200m
-filename2 = 'Zpyc800_mupyc200_example.mat';
+filename2 = './data/example_data_400_200.mat';
 
 % SET BOTH TO ZERO FOR CONSTANT STRATIFICATION
-Zpyc = -800;  % Pycnocline width (m) MUST BE NEGATIVE
+Zpyc = -400;  % Pycnocline width (m) MUST BE NEGATIVE
 mupyc = 200;  % Pycnocline depth (m) MUST BE POSITIVE
 
 
@@ -141,3 +142,5 @@ subplot(4,1,4)
 plot(xx(1,1:2:end)/1e3,XFlux,'LineWidth',2)
 xlabel('Cross-shore distance (km)')
 ylabel({'Integrated cross-shore', 'energy flux (W/m)'})
+
+save(filename2)

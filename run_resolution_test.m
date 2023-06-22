@@ -26,11 +26,11 @@
 addpath('./matlab_functions')
 
 %grid points in x
-Nx_vec = 600:200:2400;
+Nx_vec = 600:200:3400;
 %grid points in z
 Nz = [10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 300]; 
 
-Nx = 1800; %grid points in x
+Nx = 3400; %grid points in x
 Nz = 300; %grid points in z
 R = 0;  %rigid lid
 force_type = 0; %Baines body force
@@ -48,13 +48,15 @@ g = 9.81; %gravity (m/s^2)
 N2back = (2*pi/(0.5*60*60))^2 ; %background linear stratification N^2 (1/s^2)
 eta0 = 0.1; %sea surface elevation at the coast (m)
 
-Zpyc = -800; %pycnocline depth (m) %must be negative
+f_vec = linspace(0.5,1.35,50)*1e-4;
+
+Zpyc = -600; %pycnocline depth (m) %must be negative
 mupyc = 200; %pycnocline width (m) %must be positive
 
-%% Sweep over Nx (horizontal resolution), keep Nz constant
-
 figure;
-subplot(1,2,1)
+
+%% Sweep over Nx (horizontal resolution), keep Nz constant
+subplot(2,2,1)
 hold on
 for inx = 1:length(Nx_vec)
     
@@ -76,7 +78,7 @@ title('Vary Nx')
 
 %% Sweep over Nz (vertical resolution), keep Nx constant
 
-subplot(1,2,2)
+subplot(2,2,2)
 hold on
 for inz = 1:length(Nz_vec)
     
@@ -87,11 +89,61 @@ for inz = 1:length(Nz_vec)
                         L,h0,xW,xs,hc,hs,f,sigma,N2back,eta0);
 
 
-    plot(xx(1,1:2:end),XFlux,'LineWidth',1.5)
+    plot(xx(1,1:2:end)/1e3,XFlux/1e3,'LineWidth',2)
     
 end
 legend('10', '20', '30', '40', '50', ...
     '75', '100','150', '200', '250', '300');
 xlabel('Cross-shore distance (km)')
+ylabel('Cross-shore energy flux (kW/m)')
+title('Vary Nz')
+
+%% Sweep over Nx (horizontal resolution), keep Nz constant
+% this time varying Coriolis parameter f
+subplot(2,2,3)
+hold on
+for inx = 1:length(Nx_vec)
+    for ifx = 1:length(f_vec)
+    [~,~,~,XFlux,~, ~, ~,...
+                ~, ~, ~, ~, ~,...
+                xx, ~, ~, ~, ~, ~] = ...
+                        func_simulation(Nx_vec(inx), Nz, ...
+                        R, Zpyc, mupyc, force_type, l,...
+                        L,h0,xW,xs,hc,hs,f_vec(ifx), ...
+                        sigma,N2back,eta0);
+
+    XF(ifx) = XFlux(1);
+    end
+    plot(sqrt(sigma^2-f_vec.^2),XF/1e3,'LineWidth',2)
+end
+legend('600','800','1000','1200', '1400','1800', '2000',...
+          '2200', '2400','2600','2800','3000','3200','3400');
+xlabel('$\sqrt{\omega^-f^2}\,(\rm{s}^{-1})$', ...
+    'Interpreter','latex')
+ylabel('Cross-shore energy flux (kW/m)')
+title('Vary Nx')
+
+%% Sweep over Nz (vertical resolution), keep Nx constant
+
+subplot(2,2,4)
+hold on
+for inz = 1:length(Nz_vec)
+    for ifx = 1:length(f_vec)
+    [~,~,~,XFlux,~, ~, ~,...
+                ~, ~, ~, ~, ~,...
+                xx, ~, ~, ~, ~, ~] = ...
+                        func_simulation(Nx, Nz_vec(inz), ...
+                        R, Zpyc, mupyc, force_type, l,...
+                        L,h0,xW,xs,hc,hs,f_vec(ifx), ...
+                        sigma,N2back,eta0);
+
+    XF(ifx) = XFlux(1);
+    plot(sqrt(sigma^2-f_vec.^2),XF/1e3,'LineWidth',2)
+    end
+end
+legend('10', '20', '30', '40', '50', ...
+    '75', '100','150', '200', '250', '300');
+xlabel('$\sqrt{\omega^-f^2}\,(\rm{s}^{-1})$', ...
+    'Interpreter','latex')
 ylabel('Cross-shore energy flux (kW/m)')
 title('Vary Nz')

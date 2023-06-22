@@ -37,7 +37,9 @@
 %         (R=0, rigid lid approx
 %          R=1, linear free surface approx.)
 %     Zpyc[1,1]: pycnocline depth (m) --> negative number!
+%               =0: constant stratification
 %     mupyc[1,1]: pycnocline width (m)
+%               =0: constant stratification
 %     force_type[1,1]: forcing type for the problem
 %         (force_type=0, Baines body force 
 %          force_type=1, isolated topographic force)
