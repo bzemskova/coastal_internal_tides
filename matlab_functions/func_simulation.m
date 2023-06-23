@@ -85,7 +85,7 @@
 function [uModeF,vModeF,pModeF,XFlux,AFlux, fu, fv,...
                 Cg, up_modal_offshore, up_modal_integrated, E_u2,... 
                 Eu2_integrated,...
-                xx, z, N2, h, hx, F] = ...
+                xx, z, N2, h, hx, F,up_modal_all] = ...
                         func_simulation(Nx, Nz, R, Zpyc, mupyc, ...
                         force_type, l,...
                         L,h0,xW,xs,hc,hs,f,sigma,N2back,eta0)
@@ -227,7 +227,7 @@ p_av = mean(pModeF,1); %depth-averaged pressure
 AAscat = E2inv*(uModeF(:,1)-u_av(1)) ;
 E1_amp = E1*diag(AAscat);
 
-P1 = E1_amp*exp(-I*k*dx);
+P1 = E1_amp*diag(exp(-I*k*dx));
 U1 =  E1_amp*((-I/(sigma*(1 - (gamma^2))))*diag((-I*k)))*diag(exp(-I*k*dx));
 
 % Cross-shore energy flux for each mode <up> at the off-shore boundary
@@ -235,6 +235,16 @@ up_modal_offshore = g*rho0*(0.5*(real(P1).*real(U1) + ...
     imag(P1).*imag(U1)));  %as function of depth (W/m^2)
 
 up_modal_integrated = h(1)*(mean(up_modal_offshore,1)); %vertically integrated (W/m)
+
+%find total cross-shore energy flux in u_i*p_j (includes modal energy i=j
+% and cross-term modal energy i \neq j) (W/m^2)
+up_modal_all = zeros(Nz-1,Nz-1);
+for i=1:Nz-1
+for j=1:Nz-1
+up_modal_all(i,j) = h(1)*g*rho0*(mean(0.5*(real(P1(:,i)).*real(U1(:,j)) + ...
+        imag(P1(:,i)).*imag(U1(:,j)))));
+end
+end
 
 % Cross-shore energy for each mode at the off-shore boundary
 E_u2 = (0.5*(real(U1).*real(U1) + ...
