@@ -20,21 +20,14 @@ function [XFlux,AFlux,fu,fv] = calcFluxFunc(uModeF,vModeF,pModeF,h,nu)
 %     XFlux[Nx/2,1]: vertically-integrated cross-shore flux (m^3/s)
 %     AFlux[Nx/2,1]: vertically-integrated along-shore flux (m^3/s)
     
-% Remove depth-average from u and p to recompute fluxes
-u_av = mean(uModeF,1); %depth-averaged cross-shore velocity
-v_av = mean(vModeF,1); %depth-averaged along-shore velocity
-p_av = mean(pModeF,1); %depth-averaged pressure
-%remove depth average
-u = uModeF-u_av; 
-v = vModeF-v_av; 
-p = pModeF-p_av;
+
 
 % Cross shore flux [kg /s^3]/[m / s^2]/[kg / m^3] = [m^2 / s]
-fu = 0.5*(real(u).*real(p) +...
-    imag(u).*imag(p)); 
+fu = 0.5*(real(uModeF).*real(pModeF) +...
+    imag(uModeF).*imag(pModeF)); 
 % Along shore flux [kg /s^3] = W/m^2
-fv = 0.5*(real(v).*real(p) +...
-    imag(v).*imag(p)); 
+fv = 0.5*(real(vModeF).*real(pModeF) +...
+    imag(vModeF).*imag(pModeF)); 
 
 
 % depth integral, [m^3 / s]

@@ -29,9 +29,6 @@ if (R==0)
          c = c(1:end-1) ;
       end
    
-    P = [ones(Nz,1) P] ;
-    W = [zeros(Nz,1) W] ;
-    c = [sqrt(g*h0); c] ;  
 
 end
 

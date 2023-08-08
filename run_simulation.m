@@ -284,13 +284,8 @@ normalize_pressure(PP,l,f,sigma,xx,z,h,np,nu);
 % Group velocity for each mode
 Cg = (sigma^2-f^2)/sigma./k;  %(m/s)
 
-% Remove depth-average from u and p to recompute fluxes
-u_av = mean(uModeF,1); %depth-averaged cross-shore velocity
-v_av = mean(vModeF,1); %depth-averaged along-shore velocity
-p_av = mean(pModeF,1); %depth-averaged pressure
-
 %Calculate modal distribution of the fluxes
-AAscat = E2inv*(uModeF(:,1)-u_av(1)) ;
+AAscat = E2inv*(uModeF(:,1)) ;
 E1_amp = E1*diag(AAscat);
 
 P1 = E1_amp*diag(exp(-I*k*dx));
